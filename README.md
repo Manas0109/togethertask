@@ -2,13 +2,9 @@
 
 A new Flutter project.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
 # About the Project
 
-a Flutter app that features a discovery page. This page loads
+A Flutter app that features a discovery page. This page loads
 data from a mock API and implement pagination with unlimited scroll until the API returns empty
 data.
 
