@@ -39,17 +39,46 @@ class _PaginationDemoState extends State<PaginationDemo> {
     fetchData();
   }
 
-  Future referechData() async {
-    setState(() {
-      items.clear();
-      page = 1;
-      hasMore = true;
-      isLoading = false;
-    });
-    fetchData();
-  }
 
-  Future<void> fetchData() async {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey.shade100,
+      appBar: AppBar(
+        title: const Text('Together Task'),
+      ),
+      body: RefreshIndicator(
+        onRefresh: referechData,
+        child: ListView.builder(
+          //controller for pagination
+          controller: scrollController
+            ..addListener(() {
+              if (scrollController.position.pixels ==
+                  scrollController.position.maxScrollExtent) {
+                fetchData();
+              }
+            }),
+          padding: const EdgeInsets.all(12),
+          itemCount: items.length + (hasMore ? 1 : 0),
+          itemBuilder: (context, index) {
+            //if index is less than items length, return the item widget
+            if (index < items.length) {
+              return ItemWidget(title: items[index]['title'], image: items[index]['image_url'], desc: items[index]['description']);
+            }
+            else{
+              //skeleton reloader 
+              return const Center(
+                child: Skeletonizer(child: 
+                ItemWidget(title: "title", image: "image", desc: "desc")
+              ));
+            }
+          },
+        ),
+      ),
+    );
+  }
+    //fetch data from api
+    Future<void> fetchData() async {
     if (!hasMore || isLoading){ 
       return;}
 
@@ -73,40 +102,14 @@ class _PaginationDemoState extends State<PaginationDemo> {
       throw Exception('Failed to load data');
     }
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: AppBar(
-        title: const Text('Together Task'),
-      ),
-      body: RefreshIndicator(
-        onRefresh: referechData,
-        child: ListView.builder(
-          controller: scrollController
-            ..addListener(() {
-              if (scrollController.position.pixels ==
-                  scrollController.position.maxScrollExtent) {
-                fetchData();
-              }
-            }),
-          padding: const EdgeInsets.all(12),
-          itemCount: items.length + (hasMore ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index < items.length) {
-              return ItemWidget(title: items[index]['title'], image: items[index]['image_url'], desc: items[index]['description']);
-            }
-            else{
-              //skeleton reloader 
-              return const Center(
-                child: Skeletonizer(child: 
-                ItemWidget(title: "title", image: "image", desc: "desc")
-              ));
-            }
-          },
-        ),
-      ),
-    );
+  //refresh data
+    Future referechData() async {
+    setState(() {
+      items.clear();
+      page = 1;
+      hasMore = true;
+      isLoading = false;
+    });
+    fetchData();
   }
 }
